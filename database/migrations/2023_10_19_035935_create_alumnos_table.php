@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('apellido_p');
             $table->string('apellido_m');
             $table->string('clave')->unique();
+            $table->string('imagen')->nullable();
             $table->timestamps();
         });
     }

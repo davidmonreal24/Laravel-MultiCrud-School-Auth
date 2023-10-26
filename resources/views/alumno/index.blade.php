@@ -40,6 +40,7 @@
 										<th>Apellido Paterno</th>
 										<th>Apellido Materno</th>
 										<th>Clave</th>
+                                        <th>Imagen</th>
 
                                         <th></th>
                                     </tr>
@@ -53,6 +54,7 @@
 											<td>{{ $alumno->apellido_p }}</td>
 											<td>{{ $alumno->apellido_m }}</td>
 											<td>{{ $alumno->clave }}</td>
+                                            <td> <img src="{{ asset('storage/' . $alumno->imagen) }}" alt="Imagen del alumno" style="width: 300px;"></td>
 
                                             <td>
                                                 <form action="{{ route('alumnos.destroy',$alumno->id) }}" method="POST">

@@ -46,7 +46,17 @@ class StatsController extends Controller
     public function generatePDF()
     {
         $alumnos = Alumno::all();
-        $materias = Materia::all();
+        $materias = Materia::select(
+            'materias.id',
+            'materias.nombre',
+            'materias.maestro',
+            DB::raw('COUNT(calificaciones.id_alumno) as cantidad_alumnos')
+        )
+            // ->addSelect()
+            ->leftJoin('calificaciones', 'materias.id', '=', 'calificaciones.id_materia')
+            ->groupBy('materias.id', 'materias.nombre', 'materias.maestro')
+            ->orderBy('cantidad_alumnos', 'desc')
+            ->paginate();
         $alumnosConMaterias = Alumno::select(
             'alumnos.id',
             'alumnos.nombre',
@@ -60,16 +70,7 @@ class StatsController extends Controller
             ->orderBy('cantidad_materias', 'desc')
             ->get();
 
-        $pdf = Pdf::loadView('stats.generatePDF', compact('alumnos','alumnosConMaterias','materias'));
-        return $pdf->stream();
-        // $pdf = Pdf::loadView('stats.generatePDF', compact('alumnos', 'alumnosConMaterias'));
-        // return $pdf->download('reporte.pdf');
-        
-
-        // $pdf = new Dompdf();
-        // $pdf->loadDOM()
-        // return $pdf->download('reporte.pdf');
-        // $pdf = Pdf::loadView('stats.generatePDF', compact('alumnos', 'materias', 'alumnosConMaterias'));
-        // return $pdf->stream('invoice.pdf');
+        $pdf = Pdf::loadView('stats.generatePDF', compact('alumnos', 'alumnosConMaterias', 'materias'));
+        return $pdf->download();
     }
 }

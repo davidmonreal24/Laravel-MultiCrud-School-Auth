@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Alumno;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class AlumnoController
@@ -44,11 +45,19 @@ class AlumnoController extends Controller
     public function store(Request $request)
     {
         request()->validate(Alumno::$rules);
+        $nombre = $request->file('imagen')->getClientOriginalName();
+        $image = $request->file('imagen')->storeAs("public", $nombre);
+        $alumno = new Alumno();
+        $alumno->nombre = $request->input('nombre');
+        $alumno->apellido_p = $request->input('apellido_p');
+        $alumno->apellido_m = $request->input('apellido_m');
+        $alumno->clave = $request->input('clave');
+        $alumno->imagen = $nombre;
+        $alumno->save();
 
-        $alumno = Alumno::create($request->all());
 
-        return redirect()->route('alumnos.index')
-            ->with('success', 'Alumno creado correctamente.');
+        return redirect()->route('alumnos.index', compact('alumno'))
+            ->with('success', 'Alumno guardado correctamente.');
     }
 
     /**
@@ -87,8 +96,21 @@ class AlumnoController extends Controller
     public function update(Request $request, Alumno $alumno)
     {
         request()->validate(Alumno::$rules);
-
-        $alumno->update($request->all());
+        
+        if ($request->hasFile('imagen')) {
+            
+            $nombre = $request->file('imagen')->getClientOriginalName();
+            $image = $request->file('imagen')->storeAs("public", $nombre);
+            // dd($image);
+        } else {
+            $nombre = $alumno->imagen;
+        }
+        $alumno->nombre = $request->input('nombre');
+        $alumno->apellido_p = $request->input('apellido_p');
+        $alumno->apellido_m = $request->input('apellido_m');
+        $alumno->clave = $request->input('clave');
+        $alumno->imagen = $nombre;
+        $alumno->update();
 
         return redirect()->route('alumnos.index')
             ->with('success', 'Alumno actualizado correctamente');
